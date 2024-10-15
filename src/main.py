@@ -41,8 +41,8 @@ def start_server(num_rounds=5):
 def start_client(user_id, server_address="localhost:8080"):
     model = SimpleCNN() 
     # Pass user_id to load_femnist and load_test_data
-    train_loader = load_femnist(user_id=user_id, data_dir='./src/data/femnist')  
-    test_loader = load_test_data(user_id=user_id, data_dir='./src/data/femnist')  
+    train_loader = load_femnist(user_id=user_id, data_dir='./data/femnist')  
+    test_loader = load_test_data(user_id=user_id, data_dir='./data/femnist')  
     client = FLClient(model, train_loader, test_loader).to_client() 
     print(f"Client: Connecting to server at {server_address}...")
     fl.client.start_client(server_address=server_address, client=client)
