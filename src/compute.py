@@ -7,7 +7,7 @@ def main():
     total_accuracy = 0
 
     # Open the averages CSV file once, outside the loop
-    with open("results/no_attack/averages.csv", mode='w', newline='') as newcsvfile:
+    with open("results/attack/averages.csv", mode='w', newline='') as newcsvfile:
         writer = csv.writer(newcsvfile)
         writer.writerow(['Round', 'Average Loss', 'Average Accuracy'])  # Write header
 
@@ -18,7 +18,7 @@ def main():
 
             for j in range(11):
                 try:
-                    with open(f"results/no_attack/data{j}.csv", mode='r') as csvfile:
+                    with open(f"results/attack/data{j}.csv", mode='r') as csvfile:
                         reader = csv.DictReader(csvfile)
                         for row in reader:
                             if 'Round' in row and int(row['Round']) == i:
@@ -38,7 +38,7 @@ def main():
             writer.writerow([i, average_loss, average_accuracy])  # Write the round number
 
     print("Averages saved to averages.csv")
-    plot("results/no_attack/averages.csv")
+    plot("results/attack/averages.csv")
     plot_singular()
 
 #this takes the newly made averages csv file and plots the loss per round and accuarcy per round
@@ -65,7 +65,7 @@ def plot(file_name):
     plt.xticks(rounds)
     plt.grid()
     plt.legend()
-    plt.savefig("results/no_attack/average_loss_plot.png")
+    plt.savefig("results/attack/average_loss_plot.png")
     plt.close()
 
     plt.figure(figsize=(12, 5))
@@ -80,7 +80,7 @@ def plot(file_name):
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig("results/no_attack/average_accuracy_plot.png")
+    plt.savefig("results/attack/average_accuracy_plot.png")
     plt.close()
 
 
@@ -90,7 +90,7 @@ def plot_singular():
         losses = []
         accuracies = []
 
-        with open("results/no_attack/data" + str(i) + ".csv", mode='r') as csvfile:
+        with open("results/attack/data" + str(i) + ".csv", mode='r') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 rounds.append(int(row['Round']))
@@ -106,7 +106,7 @@ def plot_singular():
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig("results/no_attack/client" + str(i) + "_accuracy_plot.png")
+        plt.savefig("results/attack/client" + str(i) + "_accuracy_plot.png")
         plt.close()
 
         plt.figure(figsize=(12, 5))
@@ -119,7 +119,7 @@ def plot_singular():
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig("results/no_attack/client" + str(i) + "_loss_plot.png")
+        plt.savefig("results/attack/client" + str(i) + "_loss_plot.png")
         plt.close()
 
 

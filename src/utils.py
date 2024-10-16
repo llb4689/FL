@@ -83,24 +83,30 @@ def load_test_data(user_id, batch_size=32, data_dir='./src/data/femnist'):
         print(f"Warning: No test data found for client_{user_id}.")
         return None
 
-def train(model, train_loader, epochs=1, lr=0.01):
+def train(model, train_loader, epochs=1, lr=0.01, flip_labels=False):
     optimizer = optim.SGD(model.parameters(), lr=lr)
     model.train()
+    
     total_loss = 0
     total_correct = 0
     total_samples = 0
+    
     for epoch in range(epochs):
         print(f"INFO :      Training epoch {epoch + 1}/{epochs}...")
         for data, target in train_loader:
             optimizer.zero_grad()
+            if flip_labels:
+                target = (target + 1) % 10 
             output = model(data)
             loss = F.cross_entropy(output, target)
             loss.backward()
             optimizer.step()
+
             total_loss += loss.item()
             total_samples += target.size(0)
             pred = output.argmax(dim=1, keepdim=True)
             total_correct += pred.eq(target.view_as(pred)).sum().item()
+
     average_loss = total_loss / len(train_loader)
     accuracy = total_correct / total_samples
     return average_loss, accuracy 
