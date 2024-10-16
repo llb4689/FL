@@ -21,28 +21,32 @@ class FLClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)
         print("Client: Training the model...")
-        train(self.model, self.train_loader, epochs=1)  # Train for one epoch
-        return self.get_parameters(), len(self.train_loader.dataset), {}
+        train_loss, accuracy = train(self.model, self.train_loader, epochs=5)  # Train for 5 epochs
+        print("Client: Getting model parameters from the server...")
+        return self.get_parameters(), len(self.train_loader.dataset), {"loss": train_loss, "accuracy": accuracy}
 
     def evaluate(self, parameters, config):
         print("Client: Evaluating the model...")
         self.set_parameters(parameters)
         loss, accuracy = evaluate(self.model, self.test_loader)
-        print(f"Client: Evaluation results - Loss: {loss}, Accuracy: {accuracy}")
+        print(f"Client: Evaluation results - Loss: {loss:.4f}, Accuracy: {accuracy:.2f}")
         return float(loss), len(self.test_loader.dataset), {"accuracy": float(accuracy)}
 
-def start_server(num_rounds=5):
-    """Start the federated learning server."""
-    strategy = fl.server.strategy.FedAvg()  # FedAvg aggregation strategy
+
+def start_server(num_rounds):
+    strategy = fl.server.strategy.FedAvg(
+        min_available_clients=10,
+        min_fit_clients=10,
+        min_evaluate_clients=10,
+    )
     print("Server: Starting Federated Learning server...")
-    config = ServerConfig(num_rounds=num_rounds)
+    config = ServerConfig(num_rounds=num_rounds)  # Set number of rounds
     fl.server.start_server(server_address="0.0.0.0:8080", strategy=strategy, config=config)
 
 def start_client(user_id, server_address="localhost:8080"):
     model = SimpleCNN() 
-    # Pass user_id to load_femnist and load_test_data
-    train_loader = load_femnist(user_id=user_id, data_dir='./data/femnist')  
-    test_loader = load_test_data(user_id=user_id, data_dir='./data/femnist')  
+    train_loader = load_femnist(user_id=user_id, data_dir='./src/data/femnist')  
+    test_loader = load_test_data(user_id=user_id, data_dir='./src/data/femnist')  
     client = FLClient(model, train_loader, test_loader).to_client() 
     print(f"Client: Connecting to server at {server_address}...")
     fl.client.start_client(server_address=server_address, client=client)
