@@ -125,24 +125,3 @@ def save_metrics_to_csv(filename, history):
         writer.writerow(['Round', 'Loss', 'Accuracy'])
         for round_num, metrics in enumerate(history):
             writer.writerow([round_num+1, metrics['loss'], metrics['accuracy']])
-
-def plot_metrics(history):
-    """Plot training loss and accuracy over rounds."""
-    rounds = range(len(history))
-    losses = [metrics['loss'] for metrics in history]
-    accuracies = [metrics['accuracy'] for metrics in history]  
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.plot(rounds, losses, label="Loss")
-    plt.xlabel("Rounds")
-    plt.ylabel("Loss")
-    plt.title("Loss over Rounds")
-    plt.legend()
-    plt.subplot(1, 2, 2)
-    plt.plot(rounds, accuracies, label="Accuracy", color="green")
-    plt.xlabel("Rounds")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy over Rounds")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()

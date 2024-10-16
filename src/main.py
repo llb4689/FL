@@ -3,7 +3,7 @@ import flwr as fl
 from flwr.server import ServerConfig
 import torch
 from model import SimpleCNN
-from utils import load_femnist, load_test_data, train, evaluate, save_metrics_to_csv, plot_metrics
+from utils import load_femnist, load_test_data, train, evaluate, save_metrics_to_csv
 
 class FLClient(fl.client.NumPyClient):
     def __init__(self, model, train_loader, test_loader, user_id):
@@ -33,7 +33,7 @@ class FLClient(fl.client.NumPyClient):
         loss, accuracy = evaluate(self.model, self.test_loader)
         print(f"Client: Evaluation results - Loss: {loss:.4f}, Accuracy: {accuracy:.2f}")
         self.history.append({"loss": loss, "accuracy": accuracy})
-        save_metrics_to_csv("data"+ str(self.user_id) + ".csv", self.history)
+        save_metrics_to_csv("results/no_attack/data"+ str(self.user_id) + ".csv", self.history)
         return float(loss), len(self.test_loader.dataset), {"accuracy": float(accuracy)}
 
 def start_server(num_rounds):
