@@ -31,12 +31,10 @@ class FEMNISTDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path = self.data[idx]
-        image = Image.open(img_path).convert("L")  # Grayscale image
+        image = Image.open(img_path).convert("L") 
         label = self.labels[idx]
-
         if self.transform:
             image = self.transform(image)
-
         return image, label
 
 def load_femnist(user_id, batch_size=32, data_dir='./src/data/femnist'):
@@ -45,8 +43,6 @@ def load_femnist(user_id, batch_size=32, data_dir='./src/data/femnist'):
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
     ])
-    
-    # Load data only for the specific client
     client_dir = os.path.join(data_dir, f'client_{user_id}')  
     if os.path.exists(client_dir):
         print(f"Loading data for client_{user_id} from {client_dir}...")
@@ -61,18 +57,15 @@ def load_femnist(user_id, batch_size=32, data_dir='./src/data/femnist'):
         print(f"Warning: Directory {client_dir} does not exist.")
         return None
 
-
 def load_test_data(user_id, batch_size=32, data_dir='./src/data/femnist'):
     transform = transforms.Compose([
         transforms.Resize((28, 28)),
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
     ])
-
     client_dir = os.path.join(data_dir, f'client_{user_id}')
     test_data = []
     test_labels = []
-
     for subfolder in range(10):
         subfolder_path = os.path.join(client_dir, str(subfolder))
         if os.path.exists(subfolder_path):
@@ -82,7 +75,6 @@ def load_test_data(user_id, batch_size=32, data_dir='./src/data/femnist'):
                     test_data.append(img_path)
                     label = int(file_name.split('_')[1].split('.')[0]) 
                     test_labels.append(label)
-
     if len(test_data) > 0:
         test_dataset = FEMNISTDataset(client_dir, transform)
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
@@ -94,11 +86,9 @@ def load_test_data(user_id, batch_size=32, data_dir='./src/data/femnist'):
 def train(model, train_loader, epochs=1, lr=0.01):
     optimizer = optim.SGD(model.parameters(), lr=lr)
     model.train()
-    
     total_loss = 0
     total_correct = 0
     total_samples = 0
-    
     for epoch in range(epochs):
         print(f"INFO :      Training epoch {epoch + 1}/{epochs}...")
         for data, target in train_loader:
@@ -107,17 +97,13 @@ def train(model, train_loader, epochs=1, lr=0.01):
             loss = F.cross_entropy(output, target)
             loss.backward()
             optimizer.step()
-
             total_loss += loss.item()
             total_samples += target.size(0)
             pred = output.argmax(dim=1, keepdim=True)
             total_correct += pred.eq(target.view_as(pred)).sum().item()
-
     average_loss = total_loss / len(train_loader)
     accuracy = total_correct / total_samples
-    
-    return average_loss, accuracy  # Return average loss and accuracy
-
+    return average_loss, accuracy 
 
 def evaluate(model, test_loader):
     model.eval()
@@ -129,13 +115,11 @@ def evaluate(model, test_loader):
             test_loss += F.cross_entropy(output, target, reduction='sum').item()
             pred = output.argmax(dim=1, keepdim=True)
             correct += pred.eq(target.view_as(pred)).sum().item()
-
     test_loss /= len(test_loader.dataset)
     accuracy = correct / len(test_loader.dataset)
     return test_loss, accuracy
 
 def save_metrics_to_csv(filename, history):
-    """Save metrics (loss and accuracy) to a CSV file."""
     with open(filename, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Round', 'Loss', 'Accuracy'])
@@ -146,8 +130,7 @@ def plot_metrics(history):
     """Plot training loss and accuracy over rounds."""
     rounds = range(len(history))
     losses = [metrics['loss'] for metrics in history]
-    accuracies = [metrics['accuracy'] for metrics in history]
-    
+    accuracies = [metrics['accuracy'] for metrics in history]  
     plt.figure()
     plt.subplot(1, 2, 1)
     plt.plot(rounds, losses, label="Loss")
@@ -155,13 +138,11 @@ def plot_metrics(history):
     plt.ylabel("Loss")
     plt.title("Loss over Rounds")
     plt.legend()
-    
     plt.subplot(1, 2, 2)
     plt.plot(rounds, accuracies, label="Accuracy", color="green")
     plt.xlabel("Rounds")
     plt.ylabel("Accuracy")
     plt.title("Accuracy over Rounds")
     plt.legend()
-    
     plt.tight_layout()
     plt.show()

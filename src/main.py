@@ -13,7 +13,6 @@ class FLClient(fl.client.NumPyClient):
         self.history = []
         self.user_id = user_id
 
-
     def get_parameters(self, config=None):
         return [param.detach().cpu().numpy() for param in self.model.parameters()]
 
@@ -24,7 +23,7 @@ class FLClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)
         print("Client: Training the model...")
-        train_loss, accuracy = train(self.model, self.train_loader, epochs=5)  # Train for 5 epochs
+        train_loss, accuracy = train(self.model, self.train_loader, epochs=5)
         print("Client: Getting model parameters from the server...")
         return self.get_parameters(), len(self.train_loader.dataset), {"loss": train_loss, "accuracy": accuracy}
 
@@ -37,7 +36,6 @@ class FLClient(fl.client.NumPyClient):
         save_metrics_to_csv("data"+ str(self.user_id) + ".csv", self.history)
         return float(loss), len(self.test_loader.dataset), {"accuracy": float(accuracy)}
 
-
 def start_server(num_rounds):
     strategy = fl.server.strategy.FedAvg(
         min_available_clients=11,
@@ -45,7 +43,7 @@ def start_server(num_rounds):
         min_evaluate_clients=11,
     )
     print("Server: Starting Federated Learning server...")
-    config = ServerConfig(num_rounds=num_rounds)  # Set number of rounds
+    config = ServerConfig(num_rounds=num_rounds)  
     fl.server.start_server(server_address="0.0.0.0:8080", strategy=strategy, config=config)
 
 def start_client(user_id, server_address="localhost:8080"):
@@ -56,7 +54,6 @@ def start_client(user_id, server_address="localhost:8080"):
     print(f"Client: Connecting to server at {server_address}...")
     fl.client.start_client(server_address=server_address, client=client)
 
-
 def main():
     parser = argparse.ArgumentParser(description="Federated Learning: Run server or client")
     parser.add_argument('--role', type=str, required=True, choices=['server', 'client'], help='Run as server or client')
@@ -64,7 +61,6 @@ def main():
     parser.add_argument('--server_address', type=str, default="localhost:8080", help='Address of the FL server (default: localhost:8080)')
     parser.add_argument('--num_rounds', type=int, default=5, help='Number of training rounds for the server')
     args = parser.parse_args()
-
     if args.role == 'server':
         start_server(num_rounds=args.num_rounds)
     elif args.role == 'client':
