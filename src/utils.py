@@ -140,7 +140,7 @@ def save_metrics_to_csv(filename, history):
         writer = csv.writer(csvfile)
         writer.writerow(['Round', 'Loss', 'Accuracy'])
         for round_num, metrics in enumerate(history):
-            writer.writerow([round_num, metrics['loss'], metrics['accuracy']])
+            writer.writerow([round_num+1, metrics['loss'], metrics['accuracy']])
 
 def plot_metrics(history):
     """Plot training loss and accuracy over rounds."""

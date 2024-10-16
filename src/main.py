@@ -6,10 +6,13 @@ from model import SimpleCNN
 from utils import load_femnist, load_test_data, train, evaluate, save_metrics_to_csv, plot_metrics
 
 class FLClient(fl.client.NumPyClient):
-    def __init__(self, model, train_loader, test_loader):
+    def __init__(self, model, train_loader, test_loader, user_id):
         self.model = model
         self.train_loader = train_loader
         self.test_loader = test_loader
+        self.history = []
+        self.user_id = user_id
+
 
     def get_parameters(self, config=None):
         return [param.detach().cpu().numpy() for param in self.model.parameters()]
@@ -30,14 +33,16 @@ class FLClient(fl.client.NumPyClient):
         self.set_parameters(parameters)
         loss, accuracy = evaluate(self.model, self.test_loader)
         print(f"Client: Evaluation results - Loss: {loss:.4f}, Accuracy: {accuracy:.2f}")
+        self.history.append({"loss": loss, "accuracy": accuracy})
+        save_metrics_to_csv("data"+ str(self.user_id) + ".csv", self.history)
         return float(loss), len(self.test_loader.dataset), {"accuracy": float(accuracy)}
 
 
 def start_server(num_rounds):
     strategy = fl.server.strategy.FedAvg(
-        min_available_clients=10,
-        min_fit_clients=10,
-        min_evaluate_clients=10,
+        min_available_clients=11,
+        min_fit_clients=11,
+        min_evaluate_clients=11,
     )
     print("Server: Starting Federated Learning server...")
     config = ServerConfig(num_rounds=num_rounds)  # Set number of rounds
@@ -47,7 +52,7 @@ def start_client(user_id, server_address="localhost:8080"):
     model = SimpleCNN() 
     train_loader = load_femnist(user_id=user_id, data_dir='./src/data/femnist')  
     test_loader = load_test_data(user_id=user_id, data_dir='./src/data/femnist')  
-    client = FLClient(model, train_loader, test_loader).to_client() 
+    client = FLClient(model, train_loader, test_loader, user_id).to_client() 
     print(f"Client: Connecting to server at {server_address}...")
     fl.client.start_client(server_address=server_address, client=client)
 
