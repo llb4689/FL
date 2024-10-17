@@ -20,7 +20,7 @@ pip install -r requirements.txt
 Running the Server:
 To start the federated learning server, run the following command:
 
-python main.py --role server --num_rounds <NUMBER_OF_ROUNDS>
+python src/main.py --role server --num_rounds <NUMBER_OF_ROUNDS>
 
 Replace <NUMBER_OF_ROUNDS> with the desired number of training rounds.
 
