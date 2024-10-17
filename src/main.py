@@ -42,7 +42,7 @@ class FLClient(fl.client.NumPyClient):
         loss, accuracy = evaluate(self.model, self.test_loader)  # Evaluate model on test set
         print(f"Client: Evaluation results - Loss: {loss:.4f}, Accuracy: {accuracy:.2f}")
         self.history.append({"loss": loss, "accuracy": accuracy})  # Store evaluation results
-        save_metrics_to_csv("results/attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
+        save_metrics_to_csv("results/no_attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
         return float(loss), len(self.test_loader.dataset), {"accuracy": float(accuracy)}  # Return loss and accuracy metrics
 
 def start_server(num_rounds):

@@ -6,58 +6,71 @@ def main():
     total_loss = 0
     total_accuracy = 0
 
-    # Open the averages CSV file once, outside the loop
-    with open("results/attack/averages.csv", mode='w', newline='') as newcsvfile:
-        writer = csv.writer(newcsvfile)
-        writer.writerow(['Round', 'Average Loss', 'Average Accuracy'])  # Write header
+    print("How many rounds did the model run?")
+    round_num = int(input()) #figuring out how many rounds were run
+    if not isinstance(round_num, int):
+        print("Please put in a number for rounds")
+        return #return if not a number
+    print("Were any of the clients poisoned? Please enter yes or no")
+    file_changer = input() #changes what file stuff goes in based on if there was an attack
+    file_head = ""
+    if file_changer == "yes": #there was an attack
+        file_head = "results/attack/"
+    elif file_changer == "no": #there was no attack
+        file_head = "results/no_attack/"
+    else:
+        print("Please enter 'yes' or 'no'")
+        return
 
-        for i in range(1, 16):  # Loop for rounds 1 to 15
-            total_loss = 0
-            total_accuracy = 0
-            rounds = 0
+    # pen the averages CSV file once, outside the loop
+    with open(file_head + "averages.csv", mode='w', newline='') as newcsvfile:
+        writer = csv.writer(newcsvfile)
+        writer.writerow(['Round', 'Average Loss', 'Average Accuracy'])  #Write header
+        for i in range(1, round_num + 1):  #loop for rounds
+            total_loss = 0 #total loss for all rounds
+            total_accuracy = 0 #total accuracy for all rounds
+            rounds = 0 #total number of rounds
 
             for j in range(11):
                 try:
-                    with open(f"results/attack/data{j}.csv", mode='r') as csvfile:
+                    with open(file_head + "data" + str(j) + ".csv", mode='r') as csvfile: #read the csv file
                         reader = csv.DictReader(csvfile)
                         for row in reader:
                             if 'Round' in row and int(row['Round']) == i:
-                                total_loss += float(row['Loss'])
-                                total_accuracy += float(row['Accuracy'])
-                                rounds += 1
-                                break  # Stop after reading the desired round
+                                total_loss += float(row['Loss']) #add client loss to total
+                                total_accuracy += float(row['Accuracy']) #add client accuracy to total
+                                rounds += 1 #add 1 to total number of rounds
+                                break  #Stop after reading the round
                 except FileNotFoundError:
-                    print(f"Warning: data{j}.csv not found.")
+                    print(f"Warning: data{j}.csv not found.") #if csv file is not found
                 except Exception as e:
-                    print(f"Error reading data{j}.csv: {e}")
+                    print(f"Error reading data{j}.csv: {e}") #if there is a problem reading csv file
 
-            average_loss = total_loss / rounds if rounds > 0 else 0
-            average_accuracy = total_accuracy / rounds if rounds > 0 else 0
+            average_loss = total_loss / rounds #compute average loss
+            average_accuracy = total_accuracy / rounds #compute average accuracy
             
-            # Write the averages for this round
-            writer.writerow([i, average_loss, average_accuracy])  # Write the round number
+            writer.writerow([i, average_loss, average_accuracy]) #write the averages for this round
 
-    print("Averages saved to averages.csv")
-    plot("results/attack/averages.csv")
-    plot_singular()
+    print("Averages saved to " + file_head + "averages.csv") #confirmation message
+    plot(file_head) #call to plot the averages
+    plot_singular(file_head) #call to plot the individual client data
 
 #this takes the newly made averages csv file and plots the loss per round and accuarcy per round
-# TODO either make a graph of all loss and acc or 10 seperate for each
-def plot(file_name):
-    rounds = []
-    losses = []
-    accuracies = []
+def plot(file_head):
+    rounds = [] #list of rounds
+    losses = [] #list of losses
+    accuracies = [] #list of accuracies
 
-    with open(file_name, mode='r') as csvfile:
+    with open(file_head + "averages.csv", mode='r') as csvfile: #read from average csv file
         reader = csv.DictReader(csvfile)
         for row in reader:
-            rounds.append(int(row['Round']))
-            losses.append(float(row['Average Loss']))
-            accuracies.append(float(row['Average Accuracy']))
+            rounds.append(int(row['Round'])) #add to rounds
+            losses.append(float(row['Average Loss'])) #add to losses
+            accuracies.append(float(row['Average Accuracy'])) #add to accuracies
 
     plt.figure(figsize=(12, 5))
 
-    #Plotting the average loss
+    #plotting the average loss
     plt.plot(rounds, losses, marker='o', color='blue', label='Average Loss')
     plt.title('Average Loss per Round')
     plt.xlabel('Round')
@@ -65,12 +78,12 @@ def plot(file_name):
     plt.xticks(rounds)
     plt.grid()
     plt.legend()
-    plt.savefig("results/attack/average_loss_plot.png")
+    plt.savefig(file_head + "average_loss_plot.png")
     plt.close()
 
     plt.figure(figsize=(12, 5))
 
-    #Plotting the average accuracy
+    #plotting the average accuracy
     plt.plot(rounds, accuracies, marker='o', color='green', label='Average Accuracy')
     plt.title('Average Accuracy per Round')
     plt.xlabel('Round')
@@ -80,22 +93,23 @@ def plot(file_name):
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig("results/attack/average_accuracy_plot.png")
+    plt.savefig(file_head + "average_accuracy_plot.png")
     plt.close()
 
 
-def plot_singular():
-    for i in range(11):
-        rounds = []
-        losses = []
-        accuracies = []
+def plot_singular(file_head):
+    for i in range(11): #loop for each client
+        rounds = [] #list of rounds
+        losses = [] #list of losses
+        accuracies = [] #list of accuracies
 
-        with open("results/attack/data" + str(i) + ".csv", mode='r') as csvfile:
+        with open(file_head + "data" + str(i) + ".csv", mode='r') as csvfile: #read from single client data
             reader = csv.DictReader(csvfile)
             for row in reader:
-                rounds.append(int(row['Round']))
-                losses.append(float(row['Loss']))
-                accuracies.append(float(row['Accuracy']))
+                rounds.append(int(row['Round'])) #add to rounds
+                losses.append(float(row['Loss'])) #add to losses
+                accuracies.append(float(row['Accuracy'])) #add to accuracies 
+        #plotting accuracy
         plt.figure(figsize=(12, 5))
         plt.plot(rounds, accuracies, marker='o', color='green', label='Accuracy')
         plt.title("Client " + str(i) + " Accuracy per Round")
@@ -106,9 +120,10 @@ def plot_singular():
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig("results/attack/client" + str(i) + "_accuracy_plot.png")
+        plt.savefig(file_head + "client" + str(i) + "_accuracy_plot.png")
         plt.close()
 
+        #plotting loss
         plt.figure(figsize=(12, 5))
         plt.plot(rounds, losses, marker='o', color='blue', label='Loss')
         plt.title("Client " + str(i) + " Loss per Round")
@@ -119,7 +134,7 @@ def plot_singular():
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig("results/attack/client" + str(i) + "_loss_plot.png")
+        plt.savefig(file_head + "client" + str(i) + "_loss_plot.png")
         plt.close()
 
 

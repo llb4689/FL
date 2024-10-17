@@ -70,6 +70,10 @@ python main.py --role client --user_id 9
 terminal 12:
 python main.py --role client --user_id 10 
 
+After this, compute.py should be run to generate averages and graphs.
+
+python compute.py
+
 ## Components
 
 FLClient: A class that represents a federated learning client. It handles model training and evaluation, communicates with the server, and stores evaluation history.
@@ -83,3 +87,21 @@ Training and Evaluation: Functions to train the model on local data and evaluate
 Metrics Saving: Functionality to save training metrics (loss and accuracy) to CSV files for analysis.
 
 ## Metrics and Visualization
+
+Individual metrics such as loss and accuracy are stored in seperate csv files during training of the FL system. This is done by writing a line to the csv file which contains the loss and accuracy of that client for that round.
+
+This files can be found in the results folder. They will be in no_attack if no clients have been poisoned and they will be in attack if clients have been poisoned. 
+
+For exmaple, the metrics of the client with user id 3 will be stored in data3.csv.
+
+The average of all clients are stored in a csv file named averages.csv. This is computed in compute.py by reading all of the individual metrics for each round and taking the average of those metrics. 
+
+Visualization takes place in the form of graphs. All of the graphs that are created are done so in compute.py
+
+Each individual metric has two graphs assiocated with it, a graph that shows the loss for that client for each round and one that shows the accuracy for each round.
+
+For example, client 3's loss graph will be named client3_loss_plot. It's accuracy graph will be named client3_accuracy_plot.
+
+There are also two more graphs, one that shows the average loss per round between all of the clients(average_loss_plot) and one that shows the average accuracy per round between all of the clients(average_accuracy_plot).
+
+
