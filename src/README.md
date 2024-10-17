@@ -74,6 +74,25 @@ After this, compute.py should be run to generate averages and graphs.
 
 python src/compute.py
 
+Enter the correct amount of rounds run and that there was no data poisoning when prompted.
+
+After this is all done, you can then add data poisoning in the form of label flipping to see how much that will affect the training of the model. To do this you will first need to change part of main.py so that the csv files will go in the correct folder. This is important, please change this line in main.py:
+
+Line 45 in main.py-
+
+Old - save_metrics_to_csv("results/no_attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
+
+New - save_metrics_to_csv("results/attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
+
+Change the no_attack to attack, this makes the csv file write in the correct place and not overwrite all of the data from before there was label flipping. 
+
+After that, for two of the clients that you create, you should add the poisoned flag. For example, this will enable label flipping in client 0:
+
+python src/main.py --role client --user_id 0 –poisoned
+
+After 2 clients have label flipping, you can run clients in the same way as before and they will not have any label flipping. After this mostly everything is the same as before. The model will automatically run at 11 clients again. When running compute.py, please enter that there was poisoning so that the csv files and graph go to the correct folder.
+
+
 ## Components
 
 FLClient: A class that represents a federated learning client. It handles model training and evaluation, communicates with the server, and stores evaluation history.
