@@ -7,8 +7,9 @@ def main():
     total_accuracy = 0
 
     print("How many rounds did the model run?")
-    round_num = int(input()) #figuring out how many rounds were run
-    if not isinstance(round_num, int):
+    try:
+        round_num = int(input()) #figuring out how many rounds were run
+    except ValueError:
         print("Please put in a number for rounds")
         return #return if not a number
     print("Were any of the clients poisoned? Please enter yes or no")

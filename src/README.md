@@ -35,44 +35,44 @@ Replace <USER_ID> with the client's user ID (0 for client_0, 1 for client_1, etc
 For example:
 
 terminal 1:
-python main.py --role server --num_rounds 15
+python src/main.py --role server --num_rounds 15
 
 terminal 2:
-python main.py --role client --user_id 0 
+python src/main.py --role client --user_id 0 
 
 terminal 3:
-python main.py --role client --user_id 1
+python src/main.py --role client --user_id 1
 
 terminal 4:
-python main.py --role client --user_id 2 
+python src/main.py --role client --user_id 2 
 
 terminal 5:
-python main.py --role client --user_id 3 
+python src/main.py --role client --user_id 3 
 
 terminal 6:
-python main.py --role client --user_id 4 
+python src/main.py --role client --user_id 4 
 
 terminal 7:
-python main.py --role client --user_id 5 
+python src/main.py --role client --user_id 5 
 
 terminal 8:
-python main.py --role client --user_id 6 
+python src/main.py --role client --user_id 6 
 
 terminal 9:
-python main.py --role client --user_id 7 
+python src/main.py --role client --user_id 7 
 
 terminal 10:
-python main.py --role client --user_id 8 
+python src/main.py --role client --user_id 8 
 
 terminal 11:
-python main.py --role client --user_id 9 
+python src/main.py --role client --user_id 9 
 
 terminal 12:
-python main.py --role client --user_id 10 
+python src/main.py --role client --user_id 10 
 
 After this, compute.py should be run to generate averages and graphs.
 
-python compute.py
+python src/compute.py
 
 ## Components
 
