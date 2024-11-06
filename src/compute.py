@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 def main():
     total_loss = 0
     total_accuracy = 0
+    client_head = "results/clients/"
 
     print("How many rounds did the model run?")
     try:
@@ -34,7 +35,8 @@ def main():
 
             for j in range(10):
                 try:
-                    with open(file_head + "data" + str(j) + ".csv", mode='r') as csvfile: #read the csv file
+                    
+                    with open(client_head + "data" + str(j) + ".csv", mode='r') as csvfile: #read the csv file
                         reader = csv.DictReader(csvfile)
                         for row in reader:
                             if 'Round' in row and int(row['Round']) == i:
@@ -43,7 +45,7 @@ def main():
                                 rounds += 1 #add 1 to total number of rounds
                                 break  #Stop after reading the round
                 except FileNotFoundError:
-                    print(f"Warning: data{j}.csv not found.") #if csv file is not found
+                    print(f"Warning: data{j}.csv not found 1.") #if csv file is not found
                 except Exception as e:
                     print(f"Error reading data{j}.csv: {e}") #if there is a problem reading csv file
             if rounds > 0:
@@ -65,14 +67,14 @@ def plot_all_clients(file_head, round_num):
         accuracies = [] #list of accuracies
 
         try:
-            with open(file_head + "data" + str(i) + ".csv", mode='r') as csvfile: #read from average csv file
+            with open("results/clients/" + "data" + str(i) + ".csv", mode='r') as csvfile: #read from average csv file
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     rounds.append(int(row['Round'])) #add to rounds
                     losses.append(float(row['Loss'])) #add to losses
                     accuracies.append(float(row['Accuracy'])) #add to accuracies
         except FileNotFoundError:
-            print(f"Warning: data{j}.csv not found")
+            print(f"Warning: data{i}.csv not found")
             continue
         # Plot client losses
         plt.plot(rounds, losses, marker='o', label=f'Client {i}')
@@ -89,12 +91,12 @@ def plot_all_clients(file_head, round_num):
     plt.close()
 
     plt.figure(figsize=(12, 5))
-    for i in range(11):  # loop for each client
+    for i in range(10):  # loop for each client
         rounds = []
         accuracies = []
 
         try:
-            with open(file_head + "data" + str(i) + ".csv", mode='r') as csvfile:
+            with open("results/clients/" + "data" + str(i) + ".csv", mode='r') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     rounds.append(int(row['Round']))

@@ -32,9 +32,9 @@ class FLClient(fl.client.NumPyClient):
         # Apply label flipping if the client is poisoned
         if self.poisoned:
             print("Client: Applying label flipping...")  # Inform label flipping
-            train_loss, accuracy = train(self.model, self.train_loader, epochs=5, flip_labels=True)  # Train with label flipping
+            train_loss, accuracy = train(self.model, self.train_loader, flip_labels=True, epochs=5)  # Train with label flipping
         else:
-            train_loss, accuracy = train(self.model, self.train_loader, epochs=5)  # Normal training
+            train_loss, accuracy = train(self.model, self.train_loader, flip_labels= False, epochs=5)  # Normal training
         print("Client: Getting model parameters from the server...")
         return self.get_parameters(), len(self.train_loader.dataset), {"loss": train_loss, "accuracy": accuracy}  # Return updated parameters and metrics
 
@@ -44,7 +44,7 @@ class FLClient(fl.client.NumPyClient):
         loss, accuracy = evaluate(self.model, self.test_loader)  # Evaluate model on test set
         print(f"Client: Evaluation results - Loss: {loss:.4f}, Accuracy: {accuracy:.2f}")
         self.history.append({"loss": loss, "accuracy": accuracy})  # Store evaluation results
-        save_metrics_to_csv("results/no_attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
+        save_metrics_to_csv("results/clients/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
         return float(loss), len(self.test_loader.dataset), {"accuracy": float(accuracy)}  # Return loss and accuracy metrics
 
 def start_server(num_rounds):

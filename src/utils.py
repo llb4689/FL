@@ -85,7 +85,7 @@ def load_test_data(user_id, batch_size=32, data_dir='./src/data/femnist'):
         print(f"Warning: No test data found for client_{user_id}.")
         return None
 
-def train(model, train_loader, epochs=1, lr=0.01, flip_labels=False):
+def train(model, train_loader, flip_labels, epochs=1, lr=0.01):
     optimizer = optim.SGD(model.parameters(), lr=lr)  # Define optimizer
     model.train()  # Set model to training mode
     total_loss = 0  # Initialize total loss
