@@ -63,7 +63,7 @@ def start_client(user_id, server_address="localhost:8080", poisoned=False):
     train_loader = load_femnist(user_id=user_id, data_dir='./src/data/femnist')  # Load training data for client
     test_loader = load_test_data(user_id=user_id, data_dir='./src/data/femnist')  # Load testing data for client
     client = FLClient(model, train_loader, test_loader, user_id, poisoned).to_client()  # Initialize client
-    print(f"Client: Connecting to server at {server_address}... (Poisoned: {poisoned})")  # Inform server connection
+    print(f"Client: Connecting to server at {server_address}...")  # Inform server connection
     fl.client.start_client(server_address=server_address, client=client)  # Start client to connect to server
 
 """
