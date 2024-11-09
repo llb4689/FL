@@ -17,81 +17,30 @@ pip install -r requirements.txt
 
 ## Usage
 
-Running the Server:
-To start the federated learning server, run the following command:
+Do note that you also need to have two versions of the data set. One master copy outside the src directory (data/femnist), and another copy inside the src/data/femnist directory. This is so that you can poison the src/data/femnist clients, and revert everything using the (data/femnist) master copy. 
 
-python src/main.py --role server --num_rounds <NUMBER_OF_ROUNDS>
+~To poison clients run:
 
-Replace <NUMBER_OF_ROUNDS> with the desired number of training rounds.
+python src/poison.py
+You will be then prompted to identify which client you want to poison. Type a number 0-9.
 
-Running a Client:
-To start a client, use the following command in a new terminal:
+Run python src/poison.py as many times as you want clients poisoned.
 
-python main.py --role client --user_id <USER_ID> --server_address <SERVER_ADDRESS> --poisoned
+~ To run the program, run this command:
 
-Replace <USER_ID> with the client's user ID (0 for client_0, 1 for client_1, etc.), and <SERVER_ADDRESS> with the address of the federated learning server (default is localhost:8080). The --poisoned flag is optional and indicates whether the client should flip labels to simulate a poisoning attack.
+python src/main.py --role all 
+This will run the program on set defaults:
+10 clients, 10 rounds, localhost:8080, with any poisoned clients previously set.
 
-**You must first run the server in one terminal, then run 11 clients all in seperate terminals.**
-For example:
+If you would like to unpoison all clients run:
+python src/unpoison.py
+This will reset the entire data subset.
 
-terminal 1:
-python src/main.py --role server --num_rounds 15
-
-terminal 2:
-python src/main.py --role client --user_id 0 
-
-terminal 3:
-python src/main.py --role client --user_id 1
-
-terminal 4:
-python src/main.py --role client --user_id 2 
-
-terminal 5:
-python src/main.py --role client --user_id 3 
-
-terminal 6:
-python src/main.py --role client --user_id 4 
-
-terminal 7:
-python src/main.py --role client --user_id 5 
-
-terminal 8:
-python src/main.py --role client --user_id 6 
-
-terminal 9:
-python src/main.py --role client --user_id 7 
-
-terminal 10:
-python src/main.py --role client --user_id 8 
-
-terminal 11:
-python src/main.py --role client --user_id 9 
-
-terminal 12:
-python src/main.py --role client --user_id 10 
-
-After this, compute.py should be run to generate averages and graphs.
+~ Once the server has disconnected, run this command:
 
 python src/compute.py
-
-Enter the correct amount of rounds run and that there was no data poisoning when prompted.
-
-After this is all done, you can then add data poisoning in the form of label flipping to see how much that will affect the training of the model. To do this you will first need to change part of main.py so that the csv files will go in the correct folder. This is important, please change this line in main.py:
-
-Line 45 in main.py-
-
-Old - save_metrics_to_csv("results/no_attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
-
-New - save_metrics_to_csv("results/attack/data" + str(self.user_id) + ".csv", self.history)  # Save metrics to CSV
-
-Change the no_attack to attack, this makes the csv file write in the correct place and not overwrite all of the data from before there was label flipping. 
-
-After that, for two of the clients that you create, you should add the poisoned flag. For example, this will enable label flipping in client 0:
-
-python src/main.py --role client --user_id 0 –poisoned
-
-After 2 clients have label flipping, you can run clients in the same way as before and they will not have any label flipping. After this mostly everything is the same as before. The model will automatically run at 11 clients again. When running compute.py, please enter that there was poisoning so that the csv files and graph go to the correct folder.
-
+You will be asked how many rounds have ran, enter in the number (10, unless flagged otherwise)
+You will then have to answer yes or no if you poisoned any clients before running the program.
 
 ## Components
 
@@ -105,22 +54,19 @@ Training and Evaluation: Functions to train the model on local data and evaluate
 
 Metrics Saving: Functionality to save training metrics (loss and accuracy) to CSV files for analysis.
 
+Poisoning/Unpoisoning Scripts: For poisoning and unpoisoning clients.
+
 ## Metrics and Visualization
 
 Individual metrics such as loss and accuracy are stored in seperate csv files during training of the FL system. This is done by writing a line to the csv file which contains the loss and accuracy of that client for that round.
 
 This files can be found in the results folder. They will be in no_attack if no clients have been poisoned and they will be in attack if clients have been poisoned. 
 
-For exmaple, the metrics of the client with user id 3 will be stored in data3.csv.
-
 The average of all clients are stored in a csv file named averages.csv. This is computed in compute.py by reading all of the individual metrics for each round and taking the average of those metrics. 
 
 Visualization takes place in the form of graphs. All of the graphs that are created are done so in compute.py
 
-Each individual metric has two graphs assiocated with it, a graph that shows the loss for that client for each round and one that shows the accuracy for each round.
+There are two graphs, one that shows the average loss per round between all of the clients(average_loss_plot) and one that shows the average accuracy per round between all of the clients(average_accuracy_plot).
 
-For example, client 3's loss graph will be named client3_loss_plot. It's accuracy graph will be named client3_accuracy_plot.
-
-There are also two more graphs, one that shows the average loss per round between all of the clients(average_loss_plot) and one that shows the average accuracy per round between all of the clients(average_accuracy_plot).
-
+There are two more graphs, one that shows all the clients loss per round (all_clients_accuracy_plot), and one that shows all the clients accuracy per round (all_clients_loss_plot).
 
